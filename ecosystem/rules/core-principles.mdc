@@ -1,0 +1,13 @@
+---
+description: Core coding principles — minimal diff, reuse, evidence, learning
+alwaysApply: true
+---
+
+# Core Principles
+
+- Minimize scope: smallest correct diff wins.
+- Reuse before create: search codebase and LEARNINGS before writing new code.
+- Validate conclusions with evidence: grep, tests, lints — not assumptions.
+- Before non-trivial tasks: run search-learnings and read project ADRs/rules if present.
+- After proven success: use capture-learning skill (max 1 entry per session).
+- Project-specific decisions belong in project ADRs, not global LEARNINGS.

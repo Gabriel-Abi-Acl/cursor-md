@@ -1,0 +1,11 @@
+---
+description: MCP on-demand — native tools by default; MCP only when user explicitly requests
+alwaysApply: true
+---
+
+# MCP On-Demand
+
+- Default workflows use native tools: Read, Grep, Glob, Edit, Write, Shell, Task.
+- Do not call MCP tools unless the user explicitly requests them or names a specific MCP/integration in the prompt.
+- Do not install or assume claude-flow, AgentDB, or other Ruflo MCP infrastructure.
+- Learning and memory use LEARNINGS.md and local scripts — not MCP memory tools.

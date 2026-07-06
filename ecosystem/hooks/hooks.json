@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "command": "node ./hooks/pre-write-gate.mjs sessionStart"
+      }
+    ],
+    "preToolUse": [
+      {
+        "command": "node ./hooks/pre-write-gate.mjs preToolUse",
+        "matcher": "Write|Edit"
+      }
+    ],
+    "subagentStop": [
+      {
+        "command": "node ./hooks/pre-write-gate.mjs subagentStop"
+      }
+    ]
+  }
+}

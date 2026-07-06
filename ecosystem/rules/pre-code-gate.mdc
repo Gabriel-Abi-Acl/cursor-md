@@ -1,0 +1,16 @@
+---
+description: Pre-code gate required before Write/Edit on non-trivial tasks
+alwaysApply: true
+---
+
+# Pre-Code Gate
+
+Before Write/Edit on non-trivial work, run the pre-code-gate skill (or sparc-lite for large features).
+
+**Level 0 SKIP:** typo, comment-only, user says "just do it", approved plan, single-line fix.
+
+**Level 1:** medium tasks — 10 questions + compact PASS output.
+
+**Level 2:** large features — sparc-lite mini-spec first, then Level 1.
+
+Document gate result in conversation before coding. BLOCK means stop and clarify with user.

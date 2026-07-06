@@ -1,0 +1,12 @@
+---
+description: Token efficiency — explore first, batch tools, concise subagent summaries
+alwaysApply: true
+---
+
+# Token Efficiency
+
+- Explore before implement: Grep, Glob, Read — do not guess file locations.
+- Batch independent tool calls in one turn when possible.
+- Subagents return ~200-token summaries, not full transcripts.
+- Skip orchestration for single-file edits and trivial fixes.
+- Prefer flat fan-out (parallel explore) over nested subagent trees.
