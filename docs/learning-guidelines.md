@@ -53,6 +53,7 @@ node ~/.cursor/scripts/search-learnings.mjs --sync
 - Conclusões não validadas
 - Secrets, credenciais, PII
 - Regras que contradizem defaults sensatos do agente
+- **Constituição de model routing** — vive em `model-routing.mdc` + `AGENTS.md`, não em LEARNINGS. Só capture refinamentos empíricos de routing depois de evidência (ex.: slug rejeitado, trigger ajustado).
 
 ## Manutenção
 

@@ -6,10 +6,11 @@ Inspirado em padrões maduros do [Ruflo](https://github.com/ruvnet/ruflo), adapt
 
 ## O que inclui
 
-- **4 rules** always-on (princípios, pre-code gate, eficiência, MCP on-demand)
+- **5 rules** always-on (princípios, pre-code gate, eficiência, MCP on-demand, model-routing)
 - **11 skills core** + **2 packs** (security, testing)
 - **Gate pré-código** em 3 níveis (SKIP / 10 perguntas / SPARC-lite)
-- **Memory Ladder** — LEARNINGS.md + busca local
+- **Model lanes** — Auto parent; Luna / Terra High / Sol High|xhigh / Opus 5 via Task
+- **Memory Ladder** — LEARNINGS.md + busca local (memória; não hospeda policy de modelos)
 - **5 agent templates** + AGENTS.md
 - **Hooks** fail-open + scripts (validate, search, prune, cost-log)
 
@@ -63,14 +64,15 @@ node scripts/validate-ecosystem.mjs --root .
 
 1. [ ] `install.ps1` instala em `~/.cursor/` sem erro
 2. [ ] `~/.cursor/skills/` contém 13 skills (11 core + 2 packs)
-3. [ ] `~/.cursor/rules/` contém 4 rules `.mdc`
-4. [ ] Tarefa trivial → gate SKIP
-5. [ ] Bug médio → gate PASS com output ~15 linhas
-6. [ ] Feature grande → SPARC-lite + `docs/spec-*.md` no projeto
-7. [ ] `search-learnings.mjs --query "..."` retorna matches
-8. [ ] Código normal → ferramentas nativas, sem MCP automático
-9. [ ] Prompt "usa MCP X" → MCP permitido
-10. [ ] `validate-ecosystem.mjs` pass
+3. [ ] `~/.cursor/rules/` contém 5 rules `.mdc` (incl. `model-routing.mdc`)
+4. [ ] Tarefa trivial → gate SKIP (Auto inline)
+5. [ ] Bug médio → gate PASS; Auto pode spawnar Terra High
+6. [ ] Feature grande → SPARC-lite; Auto pode spawnar Sol High ou Sol xhigh
+7. [ ] Auth/security → Opus 5 lane
+8. [ ] `search-learnings.mjs --query "..."` retorna matches
+9. [ ] Código normal → ferramentas nativas, sem MCP automático
+10. [ ] Prompt "usa MCP X" → MCP permitido
+11. [ ] `validate-ecosystem.mjs` pass
 
 ## Estrutura do repositório
 
@@ -91,6 +93,7 @@ cursor-md/
 ## Documentação
 
 - [Arquitetura](docs/architecture.md)
+- [Model routing](docs/model-routing.md)
 - [Framework pré-código](docs/pre-code-framework.md)
 - [Diretrizes de aprendizado](docs/learning-guidelines.md)
 - [ADR Skill Contract](docs/adr/0001-skill-contract.md)

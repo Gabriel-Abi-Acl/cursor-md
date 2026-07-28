@@ -1,0 +1,42 @@
+---
+description: Model routing — Auto parent spawns Luna/Terra High/Sol High|xhigh/Opus 5 by exclusive lane; no Medium Terra/Sol; Composer out of default roster
+alwaysApply: true
+---
+
+# Model Routing
+
+Parent stays on **Auto**. Spawn premium models via `Task` + `model:` **only** when an exclusive-lane trigger matches. Plan mode does not imply Sol/Opus. One premium model per phase — never Sol+Opus in parallel on the same question.
+
+## Roster (exclusive lanes)
+
+| Lane | Model / Task slug | Exclusive job |
+|------|-------------------|---------------|
+| Parent / volume | **Auto** (no override) | Classify; Level 0 inline; cheap explore; exec after approved plan + ecosystem fan-out |
+| Micro | **Luna** / `gpt-5.6-luna-medium` | Scoped repetitive low-reasoning edits (batch rename, boilerplate, format, obvious apply) |
+| Medium | **Terra High** / `gpt-5.6-terra-high` | Level 1; limited trade-offs; partial-hypothesis debug; medium plan synthesis |
+| Hard (framed) | **Sol High** / `gpt-5.6-sol-high` | SPARC-lite / multi-module with clear constraints + dominant hypothesis + obvious done |
+| Hard (open) | **Sol Extra High** / `gpt-5.6-sol-xhigh` | Same hard lane when multiple hypotheses, open analysis, or costly miss |
+| Critical | **Opus 5** / `claude-opus-5-thinking-high` | Auth/crypto/secrets; high ambiguity; explicit max-quality ask |
+
+**Forbidden default slugs:** `gpt-5.6-terra-medium`, `gpt-5.6-sol-medium`. Never silently downgrade to Medium. Composer / Grok / Fable / Sonnet: not in default roster (respect explicit user request).
+
+## Spawn triggers (Auto)
+
+Spawn only if a lane checklist is true:
+
+- **Luna** — mechanical/repeatable; obvious done; no design trade-off.
+- **Terra High** — Level 1; 2+ approaches; partial-hypothesis debug; Plan medium.
+- **Sol** — Level 2 / SPARC; cross-module or multi-service; multi-hop causality; Plan hard. Then bifurcate effort:
+  - clear constraints + dominant hypothesis + obvious done → `gpt-5.6-sol-high`
+  - else → `gpt-5.6-sol-xhigh`
+- **Opus 5** — security-pack / auth/crypto/secrets; ambiguity without a single answer; “don’t miss” / max quality.
+
+No trigger → Auto inline (or explore without `model:`).
+
+## Anti-patterns
+
+- Closing non-trivial multi-file / multi-domain work without ecosystem fan-out
+- Terra doing SPARC / multi-service; Sol doing Level 1; Opus on typo or explore-only
+- Luna on logic, plans, or non-trivial ACs
+- Parallel Sol + Opus on the same question
+- Premium models in mechanical rewrite loops

@@ -1,12 +1,13 @@
 # Cursor Ecosystem — Agent Constitution
 
 > Orchestration rules for the cursor-md global ecosystem. Subagents use native Cursor `Task` tool — **not MCP**.
+> Model lanes: see always-on rule `model-routing.mdc` (Auto parent; Luna / Terra High / Sol High|xhigh / Opus 5).
 
 ## Division of labor
 
 | Role | Tool | Writes? |
 |------|------|---------|
-| Parent agent | Default | Yes |
+| Parent agent | **Auto** (default; no model override) | Yes |
 | Discovery | `Task(subagent_type: "explore")` | No (readonly) |
 | Implementation | `Task(subagent_type: "generalPurpose")` | Yes |
 | Commands | `Task(subagent_type: "shell")` | N/A |
@@ -14,7 +15,26 @@
 | Security review | `Task(subagent_type: "security-review")` | No |
 | Failed CI | `Task(subagent_type: "ci-investigator")` | No |
 
-## Routing rules
+## Model routing (Auto parent)
+
+Parent stays on Auto. Pass `model:` on `Task` only when an exclusive-lane trigger matches (`model-routing.mdc`).
+
+| Job | subagent_type (typical) | model |
+|-----|-------------------------|-------|
+| Level 0 / cheap explore / exec after approved plan | inline or explore / generalPurpose | _(none — Auto)_ |
+| Micro scoped edits | generalPurpose or shell | `gpt-5.6-luna-medium` |
+| Level 1 / medium plan / partial-hypothesis debug | generalPurpose or explore | `gpt-5.6-terra-high` |
+| Hard framed (constraints + dominant hypothesis + clear done) | generalPurpose | `gpt-5.6-sol-high` |
+| Hard open (multi-hypothesis / costly miss) | generalPurpose | `gpt-5.6-sol-xhigh` |
+| Auth/crypto/secrets / high ambiguity / max quality | security-review or generalPurpose | `claude-opus-5-thinking-high` |
+
+**Forbidden:** `gpt-5.6-terra-medium`, `gpt-5.6-sol-medium`. Never silently downgrade. Composer not in default roster.
+
+Sol bifurcation: after Sol trigger, if constraints clear + dominant hypothesis + obvious done → `gpt-5.6-sol-high`; else → `gpt-5.6-sol-xhigh`.
+
+One premium per phase; never Sol+Opus in parallel on the same question.
+
+## Routing rules (subagent_type)
 
 - **explore** — codebase search, architecture, "where is X". Parallel fan-out OK.
 - **generalPurpose** — multi-step implementation with writes.

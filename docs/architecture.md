@@ -8,11 +8,12 @@ Ecossistema de Skills, Rules, SubAgents e aprendizado para Cursor — instalado 
 
 | Componente | Local | Função |
 |----------|-------|--------|
-| Rules | `~/.cursor/rules/*.mdc` | Constituição always-on |
+| Rules | `~/.cursor/rules/*.mdc` | Constituição always-on (incl. model-routing) |
 | Skills | `~/.cursor/skills/*/SKILL.md` | Workflows especializados |
 | Packs | security-pack, testing-pack | Domínios security/testing |
 | Agents | `~/.cursor/agents/*.md` | Templates de prompt Task |
-| LEARNINGS | `~/.cursor/LEARNINGS.md` | Memória curada cross-project |
+| AGENTS.md | `~/.cursor/AGENTS.md` | Constituição de papéis + model lanes |
+| LEARNINGS | `~/.cursor/LEARNINGS.md` | Memória curada cross-project (não hospeda policy de modelos) |
 | Scripts | `~/.cursor/scripts/*.mjs` | search, prune, validate, cost-log |
 | Hooks | `~/.cursor/hooks.json` | Lembretes fail-open |
 
@@ -25,6 +26,10 @@ Ecossistema de Skills, Rules, SubAgents e aprendizado para Cursor — instalado 
 ## Subagents ≠ MCP
 
 Subagents (`Task`) são nativos do Cursor. Custo principal = tokens do modelo, não taxa de MCP.
+
+## Model routing
+
+Parent permanece em **Auto** e spawna Luna / Terra High / Sol High|xhigh / Opus 5 via `Task` + `model:` só quando o trigger da faixa exclusiva bate. Detalhes: [model-routing.md](model-routing.md) e rule `model-routing.mdc`.
 
 ## Comparação com Ruflo
 
@@ -58,5 +63,5 @@ Prompt → Gate (0/1/2) → Explore → Implement → Validate → Capture-learn
 ## Custo
 
 - Sem taxa por MCP
-- Controle via gates, skip conditions, subagents sob demanda
-- `cost-log.mjs` registra spawns e gate levels localmente
+- Controle via gates, skip conditions, subagents sob demanda, model lanes
+- `cost-log.mjs` registra spawns (`--type`, `--model`) e gate levels localmente

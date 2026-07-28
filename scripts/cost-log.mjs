@@ -3,6 +3,7 @@
  * cost-log.mjs — Append local JSONL log for subagent spawns and gate levels
  * Usage:
  *   node cost-log.mjs --event subagent --type explore
+ *   node cost-log.mjs --event subagent --type generalPurpose --model gpt-5.6-terra-high
  *   node cost-log.mjs --event gate --level 1
  *   node cost-log.mjs --tail
  */
@@ -14,11 +15,12 @@ const LOG_PATH = join(homedir(), '.cursor', 'cost-log.jsonl');
 
 function parseArgs() {
   const args = process.argv.slice(2);
-  const opts = { event: '', type: '', level: '', tail: false };
+  const opts = { event: '', type: '', level: '', model: '', tail: false };
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--event') opts.event = args[++i];
     if (args[i] === '--type') opts.type = args[++i];
     if (args[i] === '--level') opts.level = args[++i];
+    if (args[i] === '--model') opts.model = args[++i];
     if (args[i] === '--tail') opts.tail = true;
   }
   return opts;
@@ -39,7 +41,7 @@ function main() {
   }
 
   if (!opts.event) {
-    console.log('Usage: --event subagent|gate [--type TYPE] [--level N] | --tail');
+    console.log('Usage: --event subagent|gate [--type TYPE] [--model SLUG] [--level N] | --tail');
     return;
   }
 
@@ -47,6 +49,7 @@ function main() {
     ts: new Date().toISOString(),
     event: opts.event,
     ...(opts.type && { subagent_type: opts.type }),
+    ...(opts.model && { model: opts.model }),
     ...(opts.level && { gate_level: opts.level }),
   };
 

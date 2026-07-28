@@ -105,6 +105,23 @@ function main() {
   if (existsSync(agentsMd)) {
     const ag = readFileSync(agentsMd, 'utf8');
     if (ag.includes('mcp__')) errors.push('AGENTS.md references mcp__');
+    const requiredSlugs = [
+      'gpt-5.6-luna-medium',
+      'gpt-5.6-terra-high',
+      'gpt-5.6-sol-high',
+      'gpt-5.6-sol-xhigh',
+      'claude-opus-5-thinking-high',
+    ];
+    for (const slug of requiredSlugs) {
+      if (!ag.includes(slug)) {
+        errors.push(`AGENTS.md missing model slug: ${slug}`);
+      }
+    }
+    if (!ag.includes('model:')) {
+      warnings.push('AGENTS.md missing model: guidance');
+    }
+  } else {
+    errors.push('Missing AGENTS.md');
   }
 
   const requiredSkills = [
@@ -118,7 +135,13 @@ function main() {
     }
   }
 
-  const requiredRules = ['core-principles.mdc', 'pre-code-gate.mdc', 'token-efficiency.mdc', 'mcp-on-demand.mdc'];
+  const requiredRules = [
+    'core-principles.mdc',
+    'pre-code-gate.mdc',
+    'token-efficiency.mdc',
+    'mcp-on-demand.mdc',
+    'model-routing.mdc',
+  ];
   for (const r of requiredRules) {
     if (!existsSync(join(rulesDir, r))) errors.push(`Missing required rule: ${r}`);
   }
