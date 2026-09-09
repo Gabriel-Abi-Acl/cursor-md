@@ -1,67 +1,58 @@
-# Arquitetura do Ecossistema cursor-md
+# Arquitetura — cursor-md
 
-## Visão geral
+## Objetivo
 
-Ecossistema de Skills, Rules, SubAgents e aprendizado para Cursor — instalado globalmente em `~/.cursor/`. Inspirado em padrões do [Ruflo](https://github.com/ruvnet/ruflo), sem replicar escala (350 skills, MCP AgentDB).
+Rules + Skills (e Task nativo só quando precisa) para **melhor código no Cursor**:
+
+- Verificação **antes** de escrever (pre-code-gate / sparc-lite)
+- Código **enxuto** (minimal-diff) e **validado** (validate-changes)
+- Otimização **só com evidência** (optimize-code)
+- Aprendizado = **skills `gen-*`**, não arquivo LEARNINGS
+
+**Fora de escopo:** model lanes (Luna/Terra/Sol), AgentDB/MCP memory, swarm.
+
+Parent permanece em **Auto**.
 
 ## Componentes
 
-| Componente | Local | Função |
-|----------|-------|--------|
-| Rules | `~/.cursor/rules/*.mdc` | Constituição always-on (incl. model-routing) |
-| Skills | `~/.cursor/skills/*/SKILL.md` | Workflows especializados |
-| Packs | security-pack, testing-pack | Domínios security/testing |
-| Agents | `~/.cursor/agents/*.md` | Templates de prompt Task |
-| AGENTS.md | `~/.cursor/AGENTS.md` | Constituição de papéis + model lanes |
-| LEARNINGS | `~/.cursor/LEARNINGS.md` | Memória curada cross-project (não hospeda policy de modelos) |
-| Scripts | `~/.cursor/scripts/*.mjs` | search, prune, validate, cost-log |
-| Hooks | `~/.cursor/hooks.json` | Lembretes fail-open |
+| Peça | Função |
+|------|--------|
+| Rules (4) | always-on: principles, gate, tokens, MCP on-demand |
+| Core skills | fluxo de código |
+| Packs | security-pack, testing-pack |
+| gen-* | skills auto-mintadas |
+| AGENTS.md | Task types leves |
+| Scripts | validate-ecosystem, audit-skills, cost-log (gates) |
+| Hooks | sessionStart lembrete pre-code-gate |
 
-## MCP On-Demand
-
-- Workflows default: ferramentas nativas (Read, Grep, Edit, Task, Shell)
-- MCP configurado pelo usuário no Cursor: **permitido quando pedido explicitamente no prompt**
-- Ecossistema **não depende** de MCP nem instala claude-flow/AgentDB
-
-## Subagents ≠ MCP
-
-Subagents (`Task`) são nativos do Cursor. Custo principal = tokens do modelo, não taxa de MCP.
-
-## Model routing
-
-Parent permanece em **Auto** e spawna Luna / Terra High / Sol High|xhigh / Opus 5 via `Task` + `model:` só quando o trigger da faixa exclusiva bate. Detalhes: [model-routing.md](model-routing.md) e rule `model-routing.mdc`.
-
-## Comparação com Ruflo
-
-| Ruflo | cursor-md |
-|-------|-----------|
-| 350+ skills | 11 core + 2 packs |
-| AgentDB MCP | LEARNINGS.md + index local |
-| SPARC 5 fases | Gate 3 níveis + SPARC-lite |
-| 37 plugins | Monorepo único |
-| Task depth 4-5 | Depth 2 (3 excepcional) |
-
-## Cherry-pick do Ruflo
-
-- Progressive disclosure
-- WHAT + WHEN + SKIP WHEN
-- Orchestrator vs leaf
-- validate-plugin → validate-ecosystem.mjs
-- memory-before / memory-after
-- Verdict checklist
-
-## Excluído
-
-AgentDB MCP, ReasoningBank MCP, swarm, witness Ed25519.
-
-## Fluxo operacional
+## Fluxo
 
 ```
-Prompt → Gate (0/1/2) → Explore → Implement → Validate → Capture-learning
+Prompt → Rules → Gate (0/1/2) → Explore → Minimal implement → Validate
+       → auto-skill-mint? → gen-* skill
 ```
 
-## Custo
+## Skills core (resumo)
 
-- Sem taxa por MCP
-- Controle via gates, skip conditions, subagents sob demanda, model lanes
-- `cost-log.mjs` registra spawns (`--type`, `--model`) e gate levels localmente
+| Skill | Papel |
+|-------|--------|
+| pre-code-gate | 10 perguntas antes de codar |
+| sparc-lite | mini-spec features grandes |
+| explore-before-code | Grep/Glob/Read primeiro |
+| minimal-diff | menor mudança correta |
+| write-tests | TDD pragmático |
+| validate-changes | lint/test pós-edit |
+| optimize-code | profile-first |
+| code-review | checklist review |
+| subagent-orchestration | quando usar Task |
+| auto-skill-mint | cria gen-* após sucesso |
+| audit-generated-skills | audit/cleanup (você chama) |
+| skill-builder | contrato de skills |
+
+## MCP on-demand
+
+Nativo por default; MCP só se o usuário pedir.
+
+## Instalar
+
+`.\install.ps1` → `~/.cursor/`. Reinicie o Cursor.

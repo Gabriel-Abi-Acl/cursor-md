@@ -2,52 +2,56 @@
 
 ## Status
 
-Accepted
+Accepted (updated: gen-* auto-mint)
 
 ## Context
 
-The cursor-md ecosystem needs structural consistency for skills, inspired by Ruflo `validate-plugin` but adapted for Cursor.
+Structural consistency for Cursor skills. No MCP dependency. No LEARNINGS prose memory.
 
 ## Contract
 
-Every skill directory MUST contain:
+Every skill directory:
 
 ```
 skill-name/
 └── SKILL.md    # Required, <500 lines
 ```
 
-Optional: `reference.md`, `scripts/`
-
-### Frontmatter (required)
+### Frontmatter
 
 ```yaml
 ---
-name: kebab-case-name          # lowercase, hyphens, max 64 chars
-description: Third-person WHAT + WHEN + SKIP WHEN (max 1024 chars)
+name: kebab-case-name
+description: Third-person WHAT + WHEN + SKIP WHEN
 ---
 ```
 
-### Core skill constraints
+### Generated skills
 
-- No `mcp__` tool references in `ecosystem/skills/**`
-- Description must include trigger conditions ("Use when...")
-- Body uses progressive disclosure — details in reference.md
+```yaml
+---
+name: gen-example
+description: ...
+x-origin: auto-mint
+x-created: YYYY-MM-DD
+x-last-used: YYYY-MM-DD
+x-use-count: 0
+---
+```
 
-### Pack skills
+- Path: `ecosystem/skills/generated/<kebab>/`
+- Install: `~/.cursor/skills/gen-<kebab>/`
+- Budget: max 25 gen-*
 
-- Live under `ecosystem/packs/{domain}/{skill-name}/`
-- Installed to `~/.cursor/skills/` alongside core skills
-- May reference subagent routing but not MCP tools
+### Core constraints
+
+- No `mcp__` in core skills
+- Description includes Use when / Skip when
+- No model-routing constitution in this repo
 
 ## Validation
 
 ```bash
 node scripts/validate-ecosystem.mjs --root .
+node scripts/audit-skills.mjs --root .
 ```
-
-## Consequences
-
-- Automated CI can reject malformed skills
-- Agent discovery improves with consistent descriptions
-- Zero MCP dependency in default workflows preserved

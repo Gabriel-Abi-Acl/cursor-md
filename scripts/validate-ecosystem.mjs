@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * validate-ecosystem.mjs — Structural audit for cursor-md ecosystem
+ * validate-ecosystem.mjs — Structural audit for cursor-md
  * Usage: node scripts/validate-ecosystem.mjs --root .
  */
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
@@ -12,16 +12,6 @@ const ROOT = rootIdx >= 0 ? args[rootIdx + 1] : '.';
 
 const errors = [];
 const warnings = [];
-
-function walk(dir, files = []) {
-  if (!existsSync(dir)) return files;
-  for (const name of readdirSync(dir)) {
-    const p = join(dir, name);
-    if (statSync(p).isDirectory()) walk(p, files);
-    else files.push(p);
-  }
-  return files;
-}
 
 function parseFrontmatter(content) {
   const cleaned = content.replace(/^\uFEFF/, '');
@@ -38,16 +28,16 @@ function parseFrontmatter(content) {
   return fm;
 }
 
-function checkSkill(skillDir) {
+function checkSkill(skillDir, { allowGen = false } = {}) {
   const skillMd = join(skillDir, 'SKILL.md');
   if (!existsSync(skillMd)) {
     errors.push(`Missing SKILL.md: ${relative(ROOT, skillDir)}`);
     return;
   }
   const content = readFileSync(skillMd, 'utf8');
-  const lines = content.split('\n').length;
-  if (lines > 500) errors.push(`SKILL.md >500 lines: ${relative(ROOT, skillMd)} (${lines})`);
-
+  if (content.split('\n').length > 500) {
+    errors.push(`SKILL.md >500 lines: ${relative(ROOT, skillMd)}`);
+  }
   const fm = parseFrontmatter(content);
   if (!fm) {
     errors.push(`No frontmatter: ${relative(ROOT, skillMd)}`);
@@ -56,14 +46,26 @@ function checkSkill(skillDir) {
   if (!fm.name || !/^[a-z0-9-]+$/.test(fm.name)) {
     errors.push(`Invalid name in ${relative(ROOT, skillMd)}: ${fm.name}`);
   }
+  if (allowGen && fm.name && !fm.name.startsWith('gen-')) {
+    errors.push(`Generated skill name must start with gen-: ${relative(ROOT, skillMd)}`);
+  }
+  if (allowGen && fm['x-origin'] !== 'auto-mint') {
+    warnings.push(`Generated skill missing x-origin: auto-mint: ${relative(ROOT, skillMd)}`);
+  }
   if (!fm.description || fm.description.length < 20) {
     errors.push(`Description too short: ${relative(ROOT, skillMd)}`);
   }
-  if (!fm.description.includes('Use when') && !fm.description.includes('Use for') && !fm.description.includes('Use after')) {
+  if (
+    !fm.description.includes('Use when') &&
+    !fm.description.includes('Use for') &&
+    !fm.description.includes('Use after')
+  ) {
     warnings.push(`Description missing 'Use when': ${relative(ROOT, skillMd)}`);
   }
-
-  const isCore = relative(ROOT, skillDir).includes('ecosystem\\skills') || relative(ROOT, skillDir).includes('ecosystem/skills');
+  const rel = relative(ROOT, skillDir);
+  const isCore =
+    (rel.includes('ecosystem/skills') || rel.includes('ecosystem\\skills')) &&
+    !rel.includes('generated');
   if (isCore && /\bmcp__\w+/.test(content)) {
     errors.push(`Core skill references mcp__: ${relative(ROOT, skillMd)}`);
   }
@@ -77,57 +79,77 @@ function checkRule(rulePath) {
 
 function main() {
   const skillsRoot = join(ROOT, 'ecosystem', 'skills');
-  const packsDirs = [
-    join(ROOT, 'ecosystem', 'packs', 'security'),
-    join(ROOT, 'ecosystem', 'packs', 'testing'),
-  ];
   const rulesDir = join(ROOT, 'ecosystem', 'rules');
   const agentsMd = join(ROOT, 'AGENTS.md');
 
   if (existsSync(skillsRoot)) {
     for (const name of readdirSync(skillsRoot)) {
+      if (name === 'generated') continue;
       const p = join(skillsRoot, name);
       if (statSync(p).isDirectory()) checkSkill(p);
     }
   }
-  for (const packDir of packsDirs) {
+
+  const genRoot = join(skillsRoot, 'generated');
+  if (existsSync(genRoot)) {
+    for (const name of readdirSync(genRoot)) {
+      const p = join(genRoot, name);
+      if (!statSync(p).isDirectory()) continue;
+      if (!existsSync(join(p, 'SKILL.md'))) continue;
+      checkSkill(p, { allowGen: true });
+    }
+  }
+
+  for (const packDir of [
+    join(ROOT, 'ecosystem', 'packs', 'security'),
+    join(ROOT, 'ecosystem', 'packs', 'testing'),
+  ]) {
     if (!existsSync(packDir)) continue;
     for (const name of readdirSync(packDir)) {
       const p = join(packDir, name);
       if (statSync(p).isDirectory()) checkSkill(p);
     }
   }
+
   if (existsSync(rulesDir)) {
     for (const f of readdirSync(rulesDir).filter((f) => f.endsWith('.mdc'))) {
       checkRule(join(rulesDir, f));
     }
+    if (existsSync(join(rulesDir, 'model-routing.mdc'))) {
+      errors.push('model-routing.mdc must be removed');
+    }
   }
+
   if (existsSync(agentsMd)) {
     const ag = readFileSync(agentsMd, 'utf8');
     if (ag.includes('mcp__')) errors.push('AGENTS.md references mcp__');
-    const requiredSlugs = [
-      'gpt-5.6-luna-medium',
-      'gpt-5.6-terra-high',
-      'gpt-5.6-sol-high',
-      'gpt-5.6-sol-xhigh',
-      'claude-opus-5-thinking-high',
-    ];
-    for (const slug of requiredSlugs) {
-      if (!ag.includes(slug)) {
-        errors.push(`AGENTS.md missing model slug: ${slug}`);
-      }
-    }
-    if (!ag.includes('model:')) {
-      warnings.push('AGENTS.md missing model: guidance');
+    if (/gpt-5\.6-(luna|terra|sol)/.test(ag)) {
+      errors.push('AGENTS.md still contains model-lane slugs (remove model routing)');
     }
   } else {
     errors.push('Missing AGENTS.md');
   }
 
+  if (existsSync(join(ROOT, 'LEARNINGS.md'))) {
+    errors.push('LEARNINGS.md must be removed');
+  }
+  if (existsSync(join(skillsRoot, 'capture-learning'))) {
+    errors.push('capture-learning skill must be removed');
+  }
+
   const requiredSkills = [
-    'pre-code-gate', 'sparc-lite', 'explore-before-code', 'minimal-diff',
-    'write-tests', 'validate-changes', 'optimize-code', 'code-review',
-    'subagent-orchestration', 'capture-learning', 'skill-builder',
+    'pre-code-gate',
+    'sparc-lite',
+    'explore-before-code',
+    'minimal-diff',
+    'write-tests',
+    'validate-changes',
+    'optimize-code',
+    'code-review',
+    'subagent-orchestration',
+    'auto-skill-mint',
+    'audit-generated-skills',
+    'skill-builder',
   ];
   for (const s of requiredSkills) {
     if (!existsSync(join(skillsRoot, s, 'SKILL.md'))) {
@@ -140,7 +162,6 @@ function main() {
     'pre-code-gate.mdc',
     'token-efficiency.mdc',
     'mcp-on-demand.mdc',
-    'model-routing.mdc',
   ];
   for (const r of requiredRules) {
     if (!existsSync(join(rulesDir, r))) errors.push(`Missing required rule: ${r}`);

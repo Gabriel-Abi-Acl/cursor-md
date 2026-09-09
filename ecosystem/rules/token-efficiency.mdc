@@ -7,6 +7,6 @@ alwaysApply: true
 
 - Explore before implement: Grep, Glob, Read — do not guess file locations.
 - Batch independent tool calls in one turn when possible.
+- Prefer inline work; subagents only when pre-code gate says yes.
 - Subagents return ~200-token summaries, not full transcripts.
 - Skip orchestration for single-file edits and trivial fixes.
-- Prefer flat fan-out (parallel explore) over nested subagent trees.

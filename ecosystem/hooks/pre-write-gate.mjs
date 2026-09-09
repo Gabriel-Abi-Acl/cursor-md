@@ -1,14 +1,7 @@
 #!/usr/bin/env node
 /**
- * pre-write-gate.mjs — Fail-open hook scripts for cursor-md ecosystem
- * Reads JSON from stdin when invoked by Cursor hooks.
+ * pre-write-gate.mjs — Fail-open hooks for cursor-md
  */
-import { readFileSync, existsSync } from 'node:fs';
-import { homedir } from 'node:os';
-import { join } from 'node:path';
-
-const event = process.argv[2] || 'unknown';
-
 async function readStdin() {
   const chunks = [];
   for await (const chunk of process.stdin) chunks.push(chunk);
@@ -19,38 +12,32 @@ function output(obj) {
   process.stdout.write(JSON.stringify(obj));
 }
 
+const event = process.argv[2] || 'unknown';
+
 async function main() {
-  let input = {};
   try {
     const raw = await readStdin();
-    if (raw.trim()) input = JSON.parse(raw);
+    if (raw.trim()) JSON.parse(raw);
   } catch {
     /* fail-open */
   }
-
-  const learningsPath = join(homedir(), '.cursor', 'LEARNINGS.md');
 
   switch (event) {
     case 'sessionStart':
       output({
         continue: true,
-        additionalContext: existsSync(learningsPath)
-          ? 'Memory-before: consider running search-learnings for non-trivial tasks. Read ~/.cursor/LEARNINGS.md if relevant.'
-          : '',
+        additionalContext:
+          'If coding: apply pre-code-gate (or sparc-lite for large features). Prefer minimal-diff. Mint gen-* skills only after auto-skill-mint criteria pass.',
       });
       break;
-
     case 'preToolUse':
-      // Fail-open advisory — do not block
       output({ decision: 'allow' });
       break;
-
     case 'subagentStop':
       output({
         followupMessage: 'Ensure subagent returned a ~200-token structured summary, not a full transcript.',
       });
       break;
-
     default:
       output({ continue: true });
   }

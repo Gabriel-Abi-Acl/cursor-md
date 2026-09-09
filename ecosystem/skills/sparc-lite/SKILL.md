@@ -16,7 +16,7 @@ Structured specification before implementation on large work.
 
 ## Steps
 
-1. Search codebase and LEARNINGS for similar work.
+1. Search codebase and applicable gen-* skills for similar work.
 2. Produce mini-spec with:
    - **Functional requirements** (bullets)
    - **≥3 acceptance criteria** (Given/When/Then)

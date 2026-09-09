@@ -15,7 +15,7 @@ description: Routes security-sensitive work to security-review subagent and appl
 ## Actions
 
 1. Run code-review checklist with security focus.
-2. Spawn `Task(subagent_type: "security-review")` for diffs >50 lines in sensitive areas.
+2. Spawn `Task(subagent_type: "security-review")` for large sensitive diffs when helpful.
 3. Verify: no secrets in diff, input validated at boundaries, least privilege.
 
 ## OWASP-light checklist

@@ -10,8 +10,8 @@ description: Creates new Cursor Agent Skills following official SKILL.md structu
 ```
 skill-name/
 ├── SKILL.md       # Required, <500 lines
-├── reference.md   # Optional deep docs
-└── scripts/       # Optional utilities
+├── reference.md   # Optional
+└── scripts/       # Optional
 ```
 
 ## Frontmatter (required)
@@ -23,24 +23,35 @@ description: Third person WHAT + WHEN + SKIP WHEN. Max 1024 chars.
 ---
 ```
 
+## Auto-minted skills (gen-*)
+
+```yaml
+---
+name: gen-example-workflow
+description: ... Use when ... Skip when ...
+x-origin: auto-mint
+x-created: YYYY-MM-DD
+x-last-used: YYYY-MM-DD
+x-use-count: 0
+x-triggers: [keywords]
+---
+```
+
+- Live under `ecosystem/skills/generated/<kebab>/`
+- Install as `~/.cursor/skills/gen-<kebab>/`
+- Created only via auto-skill-mint criteria
+- Max 25 gen-* total
+
 ## Description rules
 
-- Third person ("Processes...", not "I can...")
-- Include trigger terms for discovery
-- Include skip conditions
-
-## Ecosystem constraints
-
-- No MCP tool references in core skills
-- Progressive disclosure: keep SKILL.md concise
-- Validate: `node scripts/validate-ecosystem.mjs --root .`
+- Third person; include Use when / Skip when
+- No `mcp__` tool references in core skills
 
 ## Workflow
 
-1. Gather purpose, triggers, constraints
+1. Purpose, triggers, constraints
 2. Draft name + description
-3. Write SKILL.md body with steps/checklist
-4. Add reference.md if >100 lines of detail needed
-5. Run validate-ecosystem.mjs
+3. Write SKILL.md
+4. `node scripts/validate-ecosystem.mjs --root .`
 
-See ecosystem contract: `docs/adr/0001-skill-contract.md`
+See `docs/adr/0001-skill-contract.md` and `docs/auto-skills.md`.
